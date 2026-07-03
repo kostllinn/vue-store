@@ -1,5 +1,3 @@
 <template>
-  <footer>
-    <p>Footer</p>
-  </footer>
+  <footer></footer>
 </template>

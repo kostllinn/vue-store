@@ -3,6 +3,7 @@ import HomePage from '../pages/HomePage.vue';
 import ProductPage from '../pages/ProductPage.vue';
 import CartPage from '../pages/CartPage.vue';
 import CheckoutPage from '../pages/CheckoutPage.vue';
+import AdminPage from '../pages/AdminPage.vue';
 
 const routes = [
   {
@@ -24,6 +25,11 @@ const routes = [
     path: '/checkout',
     name: 'checkout',
     component: CheckoutPage,
+  },
+  {
+    path: '/admin',
+    name: 'admin',
+    component: AdminPage,
   },
 ];
 
