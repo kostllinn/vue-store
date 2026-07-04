@@ -1,3 +1,4 @@
+<script setup></script>
 <template>
   <header class="header">
     <div class="header_wrapper">
@@ -6,7 +7,7 @@
         <img src="" alt="logo" />
       </div>
       <div class="cart">
-        <router-link to="/cart">Корзина</router-link>
+        <button @click="emit('open-cart')">Корзина</button>
       </div>
     </div>
   </header>
