@@ -1,4 +1,8 @@
-<script setup></script>
+<script setup>
+import { useCartStore } from '../../stores/cart';
+
+const cartStore = useCartStore();
+</script>
 <template>
   <header class="header">
     <div class="header_wrapper">
@@ -7,7 +11,7 @@
         <img src="" alt="logo" />
       </div>
       <div class="cart">
-        <button @click="emit('open-cart')">Корзина</button>
+        <button @click="cartStore.openCart()">Корзина</button>
       </div>
     </div>
   </header>
@@ -30,9 +34,16 @@
   }
 
   .cart {
-    a {
-      text-decoration: none;
-      color: #fff;
+    .cart {
+      button {
+        border: none;
+        background: transparent;
+
+        color: white;
+        font-size: 16px;
+
+        cursor: pointer;
+      }
     }
   }
 }

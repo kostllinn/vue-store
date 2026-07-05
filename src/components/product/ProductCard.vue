@@ -2,6 +2,9 @@
 defineProps({
   product: Object,
 });
+import { useCartStore } from '../../stores/cart';
+
+const cartStore = useCartStore();
 </script>
 
 <template>
@@ -11,11 +14,10 @@ defineProps({
     <h2 class="product-card__title">
       {{ product.title }}
     </h2>
-    <button class="product-card__favorite">♥</button>
     <p class="product-card__info">{{ product.color }} • {{ product.memory }} GB</p>
     <div class="product-card__bottom">
       <p class="product-card__price">{{ product.price }} ₴</p>
-      <button class="product-card__button">Купить</button>
+      <button @click="cartStore.addToCart(product)">Купить</button>
     </div>
   </div>
 </template>

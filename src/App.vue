@@ -5,10 +5,13 @@ import CartModal from './components/cart/CartModal.vue';
 </script>
 
 <template>
-  <Header @open-cart="isCartOpen = true" />
+  <Header />
 
   <main>
     <router-view />
   </main>
+
   <Footer />
+
+  <CartModal />
 </template>
