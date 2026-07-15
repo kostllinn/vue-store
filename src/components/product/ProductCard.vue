@@ -1,14 +1,21 @@
 <script setup>
-defineProps({
+import { useCartStore } from '../../stores/cart';
+import { useRouter } from 'vue-router';
+
+const props = defineProps({
   product: Object,
 });
-import { useCartStore } from '../../stores/cart';
 
+const router = useRouter();
 const cartStore = useCartStore();
+
+function openProduct() {
+  router.push(`/product/${props.product.slug}`);
+}
 </script>
 
 <template>
-  <div class="product-card">
+  <div class="product-card" @click="openProduct">
     <img class="product-card__image" :src="product.image" :alt="product.title" />
 
     <h2 class="product-card__title">
@@ -17,7 +24,7 @@ const cartStore = useCartStore();
     <p class="product-card__info">{{ product.color }} • {{ product.memory }} GB</p>
     <div class="product-card__bottom">
       <p class="product-card__price">{{ product.price }} ₴</p>
-      <button @click="cartStore.addToCart(product)">Купить</button>
+      <button class="product-card__button" @click.stop="cartStore.addToCart(product)"></button>
     </div>
   </div>
 </template>

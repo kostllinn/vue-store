@@ -1,8 +1,12 @@
 <script setup>
 import { useCartStore } from '../../stores/cart';
 import CartItem from './CartItem.vue';
-
+import { useRouter } from 'vue-router';
+const router = useRouter();
 const cartStore = useCartStore();
+function checkout() {
+  router.push('/checkout');
+}
 </script>
 
 <template>
@@ -29,7 +33,7 @@ const cartStore = useCartStore();
       <div class="cart-modal__footer">
         <div class="cart-modal__total">Разом: {{ cartStore.totalPrice }} ₴</div>
 
-        <button class="cart-modal__checkout">Оформити замовлення</button>
+        <button class="cart-modal__checkout" @click="checkout">Оформити замовлення</button>
       </div>
     </div>
   </div>
