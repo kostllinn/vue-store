@@ -1,16 +1,15 @@
 <script setup>
 import { iphones } from '../data/iphones';
 import { ref } from 'vue';
-import { useRoute } from 'vue-router';
+import { useRoute, useRouter } from 'vue-router';
 import { useCartStore } from '../stores/cart';
+import { useNotificationStore } from '../stores/notification';
 
+const notificationStore = useNotificationStore();
+const router = useRouter();
 const cartStore = useCartStore();
-const route = useRoute();
-const product = iphones.find((iphone) => iphone.slug === route.params.slug);
-const selectedColor = ref(product.colors[0]);
-const selectedMemory = ref(product.memoryOptions[0]);
-function addToCart() {
-  const cartProduct = {
+function createCartProduct() {
+  return {
     id: `${product.slug}-${selectedColor.value.name}-${selectedMemory.value.storage}`,
     title: product.title,
     image: selectedColor.value.image,
@@ -18,8 +17,19 @@ function addToCart() {
     memory: selectedMemory.value.storage,
     price: selectedMemory.value.price,
   };
+}
+const route = useRoute();
+const product = iphones.find((iphone) => iphone.slug === route.params.slug);
+const selectedColor = ref(product.colors[0]);
+const selectedMemory = ref(product.memoryOptions[0]);
 
-  cartStore.addToCart(cartProduct);
+function addToCart() {
+  cartStore.addToCart(createCartProduct());
+  notificationStore.show('Товар додано до кошика');
+}
+function buyNow() {
+  cartStore.addToCart(createCartProduct());
+  router.push('/checkout');
 }
 </script>
 <template>
@@ -32,7 +42,7 @@ function addToCart() {
       <h1 class="product-page__title">
         {{ product.title }}
       </h1>
-      {{ selectedMemory.price }} ₴
+      <p class="product-page__price">{{ selectedMemory.price.toLocaleString() }} ₴</p>
 
       <div class="product-page__stock">В наличии</div>
 
@@ -77,25 +87,28 @@ function addToCart() {
         </div>
       </div>
 
-      <button @click="addToCart" class="product-page__buy">Купить</button>
-      <div class="product-page__info">
-        <div class="product-page__specs">
-          <h2>Характеристики</h2>
+      <div class="product-page__actions">
+        <button class="product-page__cart" @click="addToCart">Додати до кошика</button>
 
-          <div class="product-page__spec">
-            <span>Процессор</span>
-            <b>{{ product.specs.chip }}</b>
-          </div>
+        <button class="product-page__buy" @click="buyNow">Купити</button>
+      </div>
 
-          <div class="product-page__spec">
-            <span>Экран</span>
-            <b>{{ product.specs.display }}</b>
-          </div>
+      <div class="product-page__specs">
+        <h2>Характеристики</h2>
 
-          <div class="product-page__spec">
-            <span>Батарея</span>
-            <b>{{ product.specs.battery }}</b>
-          </div>
+        <div class="product-page__spec">
+          <span>Процесор</span>
+          <strong>{{ product.specs.chip }}</strong>
+        </div>
+
+        <div class="product-page__spec">
+          <span>Дисплей</span>
+          <strong>{{ product.specs.display }}</strong>
+        </div>
+
+        <div class="product-page__spec">
+          <span>Батарея</span>
+          <strong>{{ product.specs.battery }}</strong>
         </div>
       </div>
     </div>
@@ -213,6 +226,42 @@ function addToCart() {
     flex-wrap: wrap;
   }
 
+  &__cart {
+    flex: 1;
+
+    height: 56px;
+
+    border: 2px solid #111;
+    border-radius: 16px;
+
+    background: #fff;
+
+    color: #111;
+
+    font-size: 17px;
+    font-weight: 600;
+
+    cursor: pointer;
+
+    transition: 0.2s;
+
+    &:hover {
+      background: #111;
+      color: white;
+    }
+  }
+  &__actions {
+    display: flex;
+    gap: 16px;
+
+    margin-top: 24px;
+  }
+
+  &__cart,
+  &__buy {
+    flex: 1;
+    height: 56px;
+  }
   &__memory-btn {
     min-width: 80px;
     height: 46px;
@@ -241,11 +290,8 @@ function addToCart() {
   }
 
   &__buy {
-    width: 100%;
+    flex: 1;
     height: 56px;
-
-    margin-top: 10px;
-
     border: none;
     border-radius: 16px;
 
@@ -269,7 +315,6 @@ function addToCart() {
       transform: scale(0.98);
     }
   }
-
   &__favorite {
     width: 100%;
     height: 52px;
@@ -292,39 +337,45 @@ function addToCart() {
       border-color: #111;
       background: #fafafa;
     }
-    &__specs {
-      margin-top: 40px;
-      padding-top: 30px;
+  }
 
-      border-top: 1px solid #ececec;
+  &__specs {
+    margin-top: 50px;
 
-      h2 {
-        margin-bottom: 20px;
+    padding: 28px;
 
-        font-size: 24px;
-        font-weight: 700;
-      }
+    background: #fafafa;
+
+    border: 1px solid #ececec;
+    border-radius: 22px;
+
+    h2 {
+      font-size: 24px;
+      font-weight: 700;
+
+      margin-bottom: 24px;
+    }
+  }
+
+  &__spec {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    padding: 18px 0;
+
+    border-bottom: 1px solid #e9e9e9;
+
+    &:last-child {
+      border-bottom: none;
     }
 
-    &__spec {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
+    span {
+      color: #777;
+    }
 
-      padding: 16px 0;
-
-      border-bottom: 1px solid #f3f3f3;
-
-      span {
-        color: #777;
-        font-size: 16px;
-      }
-
-      b {
-        color: #111;
-        font-size: 16px;
-        font-weight: 600;
-      }
+    strong {
+      font-weight: 700;
     }
   }
 }

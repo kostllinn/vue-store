@@ -4,12 +4,17 @@ import ProductPage from '../pages/ProductPage.vue';
 import CartPage from '../pages/CartPage.vue';
 import CheckoutPage from '../pages/CheckoutPage.vue';
 import AdminPage from '../pages/AdminPage.vue';
-
+import HeroBanner from '../components/home/HeroBanner.vue';
 const routes = [
   {
-    path: '/',
+    path: '/home',
     name: 'home',
     component: HomePage,
+  },
+  {
+    path: '/',
+    name: 'hero',
+    component: HeroBanner,
   },
   {
     path: '/product/:slug',

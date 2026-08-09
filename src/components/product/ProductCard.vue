@@ -1,7 +1,9 @@
 <script setup>
 import { useCartStore } from '../../stores/cart';
 import { useRouter } from 'vue-router';
+import { useNotificationStore } from '../../stores/notification';
 
+const notificationStore = useNotificationStore();
 const props = defineProps({
   product: Object,
 });
@@ -12,19 +14,22 @@ const cartStore = useCartStore();
 function openProduct() {
   router.push(`/product/${props.product.slug}`);
 }
+function addToCart() {
+  cartStore.addToCart(props.product);
+  notificationStore.show('Товар додано до кошика');
+}
 </script>
 
 <template>
   <div class="product-card" @click="openProduct">
-    <img class="product-card__image" :src="product.image" :alt="product.title" />
+    <img class="product-card__image" :src="product.colors[0].image" :alt="product.title" />
 
     <h2 class="product-card__title">
       {{ product.title }}
     </h2>
-    <p class="product-card__info">{{ product.color }} • {{ product.memory }} GB</p>
     <div class="product-card__bottom">
-      <p class="product-card__price">{{ product.price }} ₴</p>
-      <button class="product-card__button" @click.stop="cartStore.addToCart(product)"></button>
+      <p class="product-card__price">від {{ product.memoryOptions[0].price }} ₴</p>
+      <button class="product-card__button" @click.stop="openProduct">Купити</button>
     </div>
   </div>
 </template>
@@ -34,107 +39,88 @@ function openProduct() {
   position: relative;
 
   width: 100%;
-  padding: 20px;
+  padding: 28px;
 
-  border: 1px solid #e8e8e8;
-  border-radius: 16px;
+  border: 1px solid #f1f1f1;
+  border-radius: 22px;
 
   background: #fff;
 
-  transition: 0.25s ease;
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.05);
+
+  cursor: pointer;
+
+  transition: all 0.25s ease;
 
   &:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.08);
+    transform: translateY(-6px);
+
+    box-shadow: 0 18px 40px rgba(0, 0, 0, 0.08);
+
+    .product-card__image {
+      transform: scale(1.04);
+    }
+
+    .product-card__button {
+      background: #222;
+    }
   }
 
   &__image {
     width: 100%;
-    height: 260px;
+    height: 300px;
 
     object-fit: contain;
     display: block;
+
+    transition: 0.25s;
   }
 
   &__title {
-    margin-top: 16px;
+    margin-top: 22px;
 
-    font-size: 20px;
-    font-weight: 600;
-
-    color: #222;
-  }
-
-  &__favorite {
-    position: absolute;
-
-    top: 16px;
-    right: 16px;
-
-    border: none;
-    background: transparent;
-
-    font-size: 28px;
-
-    color: transparent;
-    -webkit-text-stroke: 2px #8f8f8f;
-
-    cursor: pointer;
-
-    transition: 0.2s;
-
-    &:hover {
-      color: #ff3b30;
-      -webkit-text-stroke: 2px #ff3b30;
-
-      transform: scale(1.1);
-    }
-  }
-
-  &__info {
-    margin-top: 8px;
-
-    color: #777;
-    font-size: 15px;
-  }
-
-  &__price {
-    margin-top: 16px;
-
-    font-size: 28px;
+    font-size: 22px;
     font-weight: 700;
 
     color: #111;
   }
 
+  &__info {
+    margin-top: 10px;
+
+    color: #8b8b8b;
+
+    font-size: 15px;
+    line-height: 1.4;
+  }
+
   &__bottom {
+    margin-top: 22px;
+
     display: flex;
-    justify-content: space-between;
-    align-items: center;
-
-    gap: 16px;
-
-    margin-top: 20px;
+    flex-direction: column;
+    gap: 18px;
   }
 
   &__price {
-    font-size: 28px;
+    font-size: 30px;
     font-weight: 700;
 
     color: #111;
   }
 
   &__button {
-    min-width: 130px;
-    height: 44px;
+    width: 100%;
+    height: 50px;
 
     border: none;
-    border-radius: 10px;
+    border-radius: 14px;
 
-    background: #2d7ef7;
+    background: #111;
 
     color: #fff;
-    font-size: 15px;
+
+    font-size: 16px;
     font-weight: 600;
 
     cursor: pointer;
@@ -142,11 +128,40 @@ function openProduct() {
     transition: 0.2s;
 
     &:hover {
-      background: #1768e2;
+      background: #222;
     }
 
     &:active {
       transform: scale(0.98);
+    }
+  }
+
+  &__favorite {
+    position: absolute;
+
+    top: 18px;
+    right: 18px;
+
+    width: 42px;
+    height: 42px;
+
+    border-radius: 50%;
+    border: 1px solid #ececec;
+
+    background: white;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    cursor: pointer;
+
+    font-size: 20px;
+
+    transition: 0.2s;
+
+    &:hover {
+      background: #f8f8f8;
     }
   }
 }

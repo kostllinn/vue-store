@@ -1,5 +1,8 @@
 <script setup>
 import { useCartStore } from '../stores/cart';
+
+import { useNotificationStore } from '../stores/notification';
+const notificationStore = useNotificationStore();
 import { ref } from 'vue';
 const name = ref('');
 const phone = ref('');
@@ -55,7 +58,6 @@ function handleCvvInput() {
 }
 
 function submitOrder() {
-  // Очищаем все ошибки
   errors.value = {
     name: '',
     phone: '',
@@ -92,8 +94,7 @@ function submitOrder() {
       return;
     }
   }
-
-  alert('✅ Замовлення успішно оформлено!');
+  notificationStore.show('Замовлення успішно оформлено', 'Дякуємо за покупку!', 'success');
 }
 </script>
 

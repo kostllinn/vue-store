@@ -17,33 +17,8 @@ onMounted(async () => {
       ...doc.data(),
     }));
 
-    const catalog = [];
+    catalogProducts.value = products.value;
 
-    products.value.forEach((product) => {
-      product.memoryOptions.forEach((memory) => {
-        product.colors.forEach((color) => {
-          catalog.push({
-            id: `${product.id}-${memory.storage}-${color.name}`,
-
-            slug: product.slug,
-            title: product.title,
-            model: product.model,
-
-            image: color.image,
-            color: color.name,
-            colorCode: color.code,
-
-            memory: memory.storage,
-            price: memory.price,
-
-            originalProduct: product,
-          });
-        });
-      });
-    });
-
-    catalogProducts.value = catalog;
-    console.log(catalogProducts.value[0]);
     console.log(catalogProducts.value);
   } catch (error) {
     console.error(error);
@@ -60,11 +35,11 @@ onMounted(async () => {
 <style scoped lang="scss">
 .products {
   max-width: 1400px;
-  margin: 40px auto;
+  margin: 50px auto;
   padding: 0 20px;
 
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 60px;
+  grid-template-columns: repeat(auto-fill, minmax(310px, 1fr));
+  gap: 34px;
 }
 </style>

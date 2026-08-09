@@ -28,7 +28,6 @@ export const useCartStore = defineStore('cart', () => {
     }
     console.log(product.id);
     console.log(existingItem);
-    openCart();
   }
 
   function increaseQuantity(id) {
