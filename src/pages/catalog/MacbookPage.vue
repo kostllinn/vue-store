@@ -1,9 +1,8 @@
 <script setup>
 import { ref, onMounted } from 'vue';
 import { collection, getDocs } from 'firebase/firestore';
-import { db } from '../services/firebase';
-
-import ProductCard from '../components/product/ProductCard.vue';
+import { db } from '../../services/firebase';
+import ProductCard from '../../components/product/ProductCard.vue';
 
 const products = ref([]);
 const catalogProducts = ref([]);
@@ -17,9 +16,7 @@ onMounted(async () => {
       ...doc.data(),
     }));
 
-    catalogProducts.value = products.value;
-
-    console.log(catalogProducts.value);
+    catalogProducts.value = products.value.filter((product) => product.category === 'macbook');
   } catch (error) {
     console.error(error);
   }
@@ -34,6 +31,7 @@ onMounted(async () => {
 
 <style scoped lang="scss">
 .products {
+  width: 100%;
   max-width: 1400px;
   margin: 50px auto;
   padding: 0 20px;

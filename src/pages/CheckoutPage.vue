@@ -3,10 +3,9 @@ import { useCartStore } from '../stores/cart';
 
 import { useNotificationStore } from '../stores/notification';
 const notificationStore = useNotificationStore();
-import { ref } from 'vue';
+import { ref, computed } from 'vue';
 const name = ref('');
 const phone = ref('');
-const email = ref('');
 const cartStore = useCartStore();
 const paymentMethod = ref('cash');
 const cardNumber = ref('');
@@ -14,11 +13,15 @@ const expiryDate = ref('');
 const expiryError = ref('');
 const cvv = ref('');
 
-const product = cartStore.items[0];
+const totalPrice = computed(() => {
+  return cartStore.items.reduce((total, item) => {
+    return total + Number(item.price) * (item.quantity || 1);
+  }, 0);
+});
+
 const errors = ref({
   name: '',
   phone: '',
-  email: '',
   cardNumber: '',
   expiryDate: '',
   cvv: '',
@@ -72,12 +75,10 @@ function submitOrder() {
     return;
   }
 
-  if (phone.value.trim() === '' && email.value.trim() === '') {
-    errors.value.phone = 'Введіть номер телефону або Email';
-    errors.value.email = 'Введіть номер телефону або Email';
+  if (phone.value.trim() === '') {
+    errors.value.phone = 'Введіть номер телефону';
     return;
   }
-
   if (paymentMethod.value === 'card') {
     if (cardNumber.value.length < 16) {
       errors.value.cardNumber = 'Номер картки повинен містити 16 цифр';
@@ -124,14 +125,6 @@ function submitOrder() {
           <input v-model="phone" class="checkout__input" type="tel" placeholder="+380" />
           <p v-if="errors.phone" class="checkout__error">
             {{ errors.phone }}
-          </p>
-        </div>
-
-        <div class="checkout__field">
-          <p class="checkout__label">Email</p>
-          <input v-model="email" class="checkout__input" type="email" placeholder="Email" />
-          <p v-if="errors.email" class="checkout__error">
-            {{ errors.email }}
           </p>
         </div>
       </div>
@@ -263,24 +256,34 @@ function submitOrder() {
       <div class="checkout__summary">
         <h2 class="checkout__title">Ваше замовлення</h2>
 
-        <div class="checkout__product">
-          <img class="checkout__image" :src="product.image" :alt="product.title" />
+        <div v-for="item in cartStore.items" :key="item.id" class="checkout__product">
+          <img class="checkout__image" :src="item.image" :alt="item.title" />
 
           <div>
-            <div class="checkout__name">{{ product.title }}</div>
+            <div class="checkout__name">
+              {{ item.title }}
+            </div>
 
-            <div class="checkout__color">{{ product.color }}</div>
+            <div v-if="item.color" class="checkout__color">
+              {{ item.color }}
+            </div>
 
-            <div class="checkout__memory">{{ product.memory }}</div>
+            <div v-if="item.memory" class="checkout__memory">
+              {{ item.memory }}
+            </div>
+
+            <div v-if="item.quantity > 1">Кількість: {{ item.quantity }}</div>
           </div>
 
-          <div class="checkout__price">{{ product.price }}</div>
+          <div class="checkout__price">
+            {{ (Number(item.price) * (item.quantity || 1)).toLocaleString() }}
+            ₴
+          </div>
         </div>
 
         <div class="checkout__total">
           <span>Разом:</span>
-
-          <span class="checkout__total-price"> 59 999 ₴ </span>
+          <span class="checkout__total-price"> {{ totalPrice.toLocaleString() }} ₴ </span>
         </div>
 
         <button @click="submitOrder" class="checkout__button">Підтвердити замовлення</button>
@@ -608,37 +611,258 @@ function submitOrder() {
 
   font-size: 15px;
 }
+/* =========================
+   ПЛАНШЕТ
+========================= */
 
-@media (max-width: 1100px) {
+@media (max-width: 1050px) {
   .checkout {
+    max-width: 900px;
+
     grid-template-columns: 1fr;
+
+    gap: 28px;
+
+    margin: 40px auto;
   }
 
   .checkout__right {
+    margin-top: 0;
+  }
+
+  .checkout__summary {
     position: static;
   }
 }
 
-@media (max-width: 700px) {
+/* =========================
+   ТЕЛЕФОН
+========================= */
+
+@media (max-width: 650px) {
   .checkout {
-    padding: 0 16px;
+    width: 100%;
+
+    margin: 24px auto;
+
+    padding: 0 14px;
+
+    display: flex;
+    flex-direction: column;
+
+    gap: 20px;
+  }
+
+  .checkout__left,
+  .checkout__right {
+    width: 100%;
+  }
+
+  .checkout__page-title {
+    margin-bottom: 20px;
+
+    font-size: 30px;
+    line-height: 1.2;
   }
 
   .checkout__card,
   .checkout__summary {
-    padding: 24px;
+    width: 100%;
+
+    padding: 20px 16px;
+
+    border-radius: 20px;
   }
+
+  .checkout__title {
+    margin-bottom: 20px;
+
+    font-size: 22px;
+  }
+
+  /* поля */
+
+  .checkout__field {
+    margin-bottom: 15px;
+  }
+
+  .checkout__label {
+    margin-bottom: 7px;
+
+    font-size: 14px;
+  }
+
+  .checkout__input {
+    height: 52px;
+
+    padding-left: 15px;
+    padding-right: 45px;
+
+    border-radius: 13px;
+
+    font-size: 15px;
+  }
+
+  /* дата + CVV */
 
   .checkout__row {
     flex-direction: column;
+
+    gap: 0;
   }
 
-  .checkout__page-title {
-    font-size: 34px;
+  .checkout__row .checkout__field {
+    margin-bottom: 15px;
+  }
+
+  /* оплата */
+
+  .checkout__payment {
+    gap: 10px;
+  }
+
+  .checkout__payment-item {
+    padding: 14px;
+
+    align-items: flex-start;
+
+    border-radius: 14px;
+
+    h4 {
+      font-size: 15px;
+    }
+
+    p {
+      font-size: 12px;
+    }
+  }
+
+  /* заказ */
+
+  .checkout__product {
+    display: grid;
+
+    grid-template-columns: 70px minmax(0, 1fr);
+    grid-template-areas:
+      'image info'
+      'image price';
+
+    column-gap: 12px;
+    row-gap: 6px;
+
+    align-items: center;
+
+    padding: 16px 0;
+  }
+
+  .checkout__image {
+    grid-area: image;
+
+    width: 70px;
+    height: 70px;
+
+    border-radius: 12px;
+  }
+
+  .checkout__product > div:nth-child(2) {
+    grid-area: info;
+
+    min-width: 0;
+  }
+
+  .checkout__name {
+    font-size: 17px;
+
+    line-height: 1.25;
+  }
+
+  .checkout__color,
+  .checkout__memory {
+    margin-top: 3px;
+
+    font-size: 13px;
+  }
+
+  .checkout__price {
+    grid-area: price;
+
+    margin-left: 0;
+
+    font-size: 18px;
+  }
+
+  /* итог */
+
+  .checkout__total {
+    margin: 22px 0;
+
+    font-size: 19px;
   }
 
   .checkout__total-price {
-    font-size: 30px;
+    font-size: 25px;
+  }
+
+  .checkout__button {
+    height: 54px;
+
+    border-radius: 14px;
+
+    font-size: 15px;
+  }
+
+  .checkout__secure {
+    margin-top: 15px;
+
+    font-size: 13px;
+  }
+}
+
+/* =========================
+   МАЛЕНЬКИЙ ТЕЛЕФОН
+========================= */
+
+@media (max-width: 380px) {
+  .checkout {
+    padding: 0 10px;
+  }
+
+  .checkout__page-title {
+    font-size: 27px;
+  }
+
+  .checkout__card,
+  .checkout__summary {
+    padding: 18px 13px;
+  }
+
+  .checkout__title {
+    font-size: 20px;
+  }
+
+  .checkout__product {
+    grid-template-columns: 60px minmax(0, 1fr);
+  }
+
+  .checkout__image {
+    width: 60px;
+    height: 60px;
+  }
+
+  .checkout__name {
+    font-size: 16px;
+  }
+
+  .checkout__price {
+    font-size: 17px;
+  }
+
+  .checkout__total {
+    font-size: 17px;
+  }
+
+  .checkout__total-price {
+    font-size: 22px;
   }
 }
 </style>
